@@ -1,0 +1,4 @@
+name: LastLife4ExtraLife
+version: '${version}'
+main: me.quickscythe.ll4el.LastLife
+api-version: '1.21'
