@@ -1,0 +1,30 @@
+{
+  "table2": {
+    "type": "OTHER",
+    "items": [
+      {
+        "item": "STICK",
+        "name": "&aRandom Item Name"
+      }
+    ]
+  },
+  "table1": {
+    "type": "SHULKER",
+    "items": [
+      {
+        "custom_model_data": 101,
+        "item": "STICK",
+        "amount": "1-5"
+      },
+      {
+        "item": "DIAMOND_SWORD",
+        "amount": "1",
+        "rarity": 0.1
+      },
+      {
+        "item": "ENDER_PEARL",
+        "amount": "6-16"
+      }
+    ]
+  }
+}

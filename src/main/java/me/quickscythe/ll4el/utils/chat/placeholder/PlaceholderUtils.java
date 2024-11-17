@@ -1,6 +1,10 @@
 package me.quickscythe.ll4el.utils.chat.placeholder;
 
 import me.quickscythe.ll4el.utils.chat.MessageUtils;
+import me.quickscythe.ll4el.utils.misc.managers.LifeManager;
+import me.quickscythe.ll4el.utils.misc.managers.PartyManager;
+import me.quickscythe.ll4el.utils.misc.managers.PlayerManager;
+import me.quickscythe.ll4el.utils.misc.managers.SettingsManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -16,9 +20,15 @@ public class PlaceholderUtils {
     public static void registerPlaceholders() {
         registerPlaceholder("name", Player::getName);
         registerPlaceholder("player", Player::getName);
-        registerPlaceholder("online", (player) -> {
-            return Bukkit.getOnlinePlayers().size() + "";
-        });
+        registerPlaceholder("online", (player) -> Bukkit.getOnlinePlayers().size() + "");
+        registerPlaceholder("lives_color", LifeManager::getLifeColor);
+
+        registerPlaceholder("setting_particles", (player)-> SettingsManager.getSettings(player).particles() ? "&aon" : "&coff");
+        registerPlaceholder("setting_icon", (player)-> SettingsManager.getSettings(player).icon() ? "&aon" : "&coff");
+        registerPlaceholder("setting_chat", (player)-> SettingsManager.getSettings(player).chat() ? "&aon" : "&coff");
+        registerPlaceholder("setting_chat", (player)-> SettingsManager.getSettings(player).chat() ? "&aon" : "&coff");
+        registerPlaceholder("party", (player)-> PlayerManager.getParty(player).equalsIgnoreCase("none") ? "" : PlayerManager.getParty(player));
+        registerPlaceholder("party_tag", (player)-> PlayerManager.getParty(player).equalsIgnoreCase("none") ? "&f" : "[" + PlayerManager.getParty(player) + "]");
 
     }
 

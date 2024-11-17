@@ -2,7 +2,8 @@ package me.quickscythe.ll4el.utils.misc.runnables;
 
 import me.quickscythe.ll4el.utils.CoreUtils;
 import me.quickscythe.ll4el.utils.chat.MessageUtils;
-import me.quickscythe.ll4el.utils.misc.BoogieManager;
+import me.quickscythe.ll4el.utils.misc.managers.BoogieManager;
+import me.quickscythe.ll4el.utils.misc.managers.PlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -21,15 +22,16 @@ public class BoogieTimer implements Runnable {
 
     @Override
     public void run() {
-        if (stage == 5) BoogieManager.selectBoogies(amount);
+         if (stage == 5) BoogieManager.selectBoogies(amount);
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (stage == 0) player.sendTitle("", MessageUtils.colorize("&c&lBoogie Selection in..."), 1, 20, 1);
-            if (stage == 1) player.sendTitle("", MessageUtils.colorize("&c&l3..."), 1, 20, 1);
-            if (stage == 2) player.sendTitle("", MessageUtils.colorize("&c&l2..."), 1, 20, 1);
-            if (stage == 3) player.sendTitle("", MessageUtils.colorize("&c&l1..."), 1, 20, 1);
-            if (stage == 4) player.sendTitle("", MessageUtils.colorize("&c&lYou are..."), 1, 20, 1);
+
+            if (stage == 0) player.sendTitle("", MessageUtils.getMessage("message.boogie.countdown.4"), 1, 20, 1);
+            if (stage == 1) player.sendTitle("", MessageUtils.getMessage("message.boogie.countdown.3"), 1, 20, 1);
+            if (stage == 2) player.sendTitle("", MessageUtils.getMessage("message.boogie.countdown.2"), 1, 20, 1);
+            if (stage == 3) player.sendTitle("", MessageUtils.getMessage("message.boogie.countdown.1"), 1, 20, 1);
+            if (stage == 4) player.sendTitle("", MessageUtils.getMessage("message.boogie.countdown.0"), 1, 20, 1);
             if (stage == 5)
-                player.sendTitle("", MessageUtils.colorize(BoogieManager.getBoogieInfo(player).getBoolean("boogie") ? "&c&la Boogie!" : "&a&lNOT a Boogie!"), 1, 20, 1);
+                player.sendTitle("", PlayerManager.getPlayerData(player).getBoolean("boogie") ? MessageUtils.getMessage("message.boogie.countdown.boogie") : MessageUtils.getMessage("message.boogie.countdown.not"), 1, 20, 1);
         }
         stage = stage + 1;
         if (stage <= 5) Bukkit.getScheduler().runTaskLaterAsynchronously(CoreUtils.getPlugin(), this, 22);

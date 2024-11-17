@@ -1,4 +1,30 @@
-name: LastLife4ExtraLife
+name: '${name}'
 version: '${version}'
 main: me.quickscythe.ll4el.LastLife
-api-version: '1.21'
+api-version: '${spigot}'
+commands:
+  party:
+    usage: "/party"
+    description: "Main party command"
+    aliases:
+      - "p"
+  settings:
+    usage: "/settings"
+    description: "Opens a GUI to change settings"
+    aliases:
+      - "set"
+      - "setting"
+  inventory:
+    usage: "/inventory <name>"
+    description: "Admin command used to open inventories"
+    aliases:
+      - "gui"
+      - "inv"
+  lastlife:
+    usage: "/lastlife help"
+    description: "Admin command for Last Life"
+    aliases:
+      - "ll"
+  status:
+    usage: "/status"
+    description: "Admin command for guis"

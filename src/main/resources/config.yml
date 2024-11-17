@@ -1,0 +1,4 @@
+chat_format:
+  party: "&a[P]"
+  player: "&f<%player%> "
+  chat: "&f%message%"

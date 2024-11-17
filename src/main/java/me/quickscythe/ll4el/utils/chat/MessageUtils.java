@@ -5,16 +5,97 @@ import com.google.common.io.ByteStreams;
 import me.quickscythe.ll4el.utils.CoreUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.json2.JSONObject;
 
 import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.logging.Level;
 
 public class MessageUtils {
 
-    private static Map<String, String> prefixes = new HashMap<>();
+    private static final File file = new File(CoreUtils.getPlugin().getDataFolder() + "/messages.json");
+    private static JSONObject messages = new JSONObject();
+
+    public static void start() {
+        createDefaultMessages();
+        StringBuilder data = new StringBuilder();
+        try {
+            if (!file.exists())
+                file.createNewFile();
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                data.append(scanner.nextLine());
+            }
+            scanner.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+        JSONObject loaded = data.toString().isEmpty() ? new JSONObject() : new JSONObject(data.toString());
+        //messages = what is in memory
+        //need to check what is in memory and hasn't been loaded then add it to file
+        boolean discrepency = false;
+        for(Map.Entry<String, Object> entry : messages.toMap().entrySet()){
+            String key = entry.getKey();
+            String text = (String) entry.getValue();
+            if(!loaded.has(key)){
+                discrepency = true;
+                loaded.put(key,text);
+            }
+        }
+        messages = loaded;
+        if(discrepency) loadChangesToFile();
+    }
+
+    private static void loadChangesToFile() {
+        try {
+            FileWriter f2 = new FileWriter(file, false);
+            f2.write(messages.toString());
+            f2.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void createDefaultMessages() {
+        messages.put("message.boogie.chat", "&cYou are a Boogie! Kill someone fast to get rid of this effect!");
+        messages.put("message.boogie.countdown.4", "&c&lBoogie will be selected in...");
+        messages.put("message.boogie.countdown.3", "&c&l3...");
+        messages.put("message.boogie.countdown.2", "&c&l2...");
+        messages.put("message.boogie.countdown.1", "&c&l1...");
+        messages.put("message.boogie.countdown.0", "&c&lYou are...");
+        messages.put("message.boogie.countdown.boogie", "&c&la Boogie!");
+        messages.put("message.boogie.countdown.not", "&a&lNOT a Boogie!");
+        messages.put("message.boogie.cured", "&aYou've been cured!");
+        messages.put("action.elimination", "[0] has been eliminated[1]!");
+        messages.put("cmd.error.player_only","&cSorry, that is a player only command.");
+        messages.put("message.lives.more", "&aYou've gained [0] lives.");
+        messages.put("cmd.loot.create.success", "&aSuccessfully created [0] loot drop at [1].");
+        messages.put("cmd.life.edit.success", "&aSuccessfully edited the lives of [0].");
+        messages.put("cmd.error.no_player", "&cSorry \"[0]\" couldn't be find. If the player is offline their username must be typed exactly.");
+        messages.put("cmd.boogie.set.success", "&a[0] is now a boogie.");
+        messages.put("cmd.boogie.roll", "&aNow rolling for [0] boogie(s).");
+        messages.put("cmd.boogie.remove.success", "&a[0] is no longer a boogie.");
+        messages.put("cmd.error.no_perm", "&cSorry, you don't have the permission to run that command.");
+        messages.put("cmd.party.join.other", "&a[0] is now in the [1] party.");
+        messages.put("party.join.success", "&aYou have joined the [0] party.");
+        messages.put("cmd.party.create", "&aSuccessfully created [0] party.");
+        messages.put("party.chat.join", "&7Party chat: &aon&7.");
+        messages.put("party.chat.leave", "&7Party chat: &coff&7.");
+        messages.put("party.chat.no_party", "&cYou aren't in a party.");
+        messages.put("error.party.no_party", "&c\"[0]\" doesn't seem to exist. Check your spelling and try again.");
+        messages.put("gui.error.not_exist", "&cThere was an error opening that GUI. Does it exist?");
+        messages.put("cmd.error.no_command", "&cSorry, couldn't find the command \"[0]\". Please check your spelling and try again.");
+
+
+
+    }
 
     public static void log(String message) {
         CoreUtils.getPlugin().getLogger().log(Level.ALL, colorize(message));
@@ -25,15 +106,6 @@ public class MessageUtils {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 
-    public static String prefixes(String key) {
-        if (prefixes.get(key) == null)
-            prefixes.put(key, colorize("&e&l" + key.toUpperCase().substring(0, 1) + key.toLowerCase().substring(1, key.length()) + " &7>&f "));
-        return prefixes.get(key);
-    }
-
-    public static void prefixes(String key, String prefix) {
-        prefixes.put(key, colorize(prefix));
-    }
 
     public static String fade(String fromHex, String toHex, String string) {
         int[] start = getRGB(fromHex);
@@ -140,12 +212,16 @@ public class MessageUtils {
     }
 
 
-    public static void sendPluginMessage(Player player, String channel, String... arguments) {
-        if (arguments == null | arguments.length == 0) return;
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        for (String s : arguments) {
-            out.writeUTF(s);
-        }
-        player.sendPluginMessage(CoreUtils.getPlugin(), channel, out.toByteArray());
+
+
+    public static String getMessage(String key, Object... replacements){
+        String a = getMessage(key);
+        for(int i=0;i!=replacements.length;i++)
+            a = a.replaceFirst("\\[" + i + "]", replacements[i].toString());
+        return a;
+    }
+
+    private static String getMessage(String key) {
+        return messages.has(key) ? colorize(messages.getString(key)) : key;
     }
 }

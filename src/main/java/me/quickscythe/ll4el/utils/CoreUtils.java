@@ -1,17 +1,22 @@
 package me.quickscythe.ll4el.utils;
 
 import me.quickscythe.ll4el.LastLife;
+import me.quickscythe.ll4el.utils.chat.ChatManager;
+import me.quickscythe.ll4el.utils.chat.DebugUtils;
 import me.quickscythe.ll4el.utils.chat.MessageUtils;
 import me.quickscythe.ll4el.utils.chat.placeholder.PlaceholderUtils;
-import me.quickscythe.ll4el.utils.misc.BoogieManager;
-import me.quickscythe.ll4el.utils.misc.LifeManager;
+import me.quickscythe.ll4el.utils.gui.GuiManager;
 import me.quickscythe.ll4el.utils.misc.PageResult;
-import me.quickscythe.ll4el.utils.chat.DebugUtils;
+import me.quickscythe.ll4el.utils.misc.managers.*;
+import me.quickscythe.ll4el.utils.misc.managers.loot.LootManager;
+import me.quickscythe.ll4el.utils.misc.runnables.HeartbeatRunnable;
 import org.bukkit.Bukkit;
+import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.awt.*;
 import java.io.FileOutputStream;
@@ -32,11 +37,30 @@ public class CoreUtils {
 
 
     public static void start(LastLife main) {
+        Bukkit.broadcastMessage("0-1");
         plugin = main;
+        Bukkit.broadcastMessage("0-2");
         plugin.saveConfig();
+        Bukkit.broadcastMessage("0-3");
+        GuiManager.init();
+        Bukkit.broadcastMessage("0-4");
         LifeManager.start();
-        BoogieManager.start();
+        Bukkit.broadcastMessage("0-5");
         PlaceholderUtils.registerPlaceholders();
+        Bukkit.broadcastMessage("0-6");
+        MessageUtils.start();
+        Bukkit.broadcastMessage("0-7");
+        PlayerManager.start();
+        Bukkit.broadcastMessage("0-8");
+        LootManager.start();
+        Bukkit.broadcastMessage("0-9");
+        PartyManager.start();
+        Bukkit.broadcastMessage("0-10");
+        ChatManager.start();
+        Bukkit.broadcastMessage("0-11");
+
+        Bukkit.getScheduler().runTaskLaterAsynchronously(CoreUtils.getPlugin(), new HeartbeatRunnable(), 0);
+
 
     }
 
@@ -45,11 +69,10 @@ public class CoreUtils {
     }
 
 
-
-
     public static void end() {
-        LifeManager.end();
-        BoogieManager.end();
+        PlayerManager.end();
+        LootManager.end();
+        PartyManager.end();
         saveConfig();
     }
 
@@ -71,6 +94,17 @@ public class CoreUtils {
         return ret;
     }
 
+    public static void playTotemAnimation(Player player, int customModelData) {
+        ItemStack totem = new ItemStack(Material.TOTEM_OF_UNDYING);
+        ItemMeta meta = totem.getItemMeta();
+        if (meta == null) return;
+        meta.setCustomModelData(customModelData);
+        totem.setItemMeta(meta);
+        ItemStack hand = player.getInventory().getItemInMainHand();
+        player.getInventory().setItemInMainHand(totem);
+        player.playEffect(EntityEffect.TOTEM_RESURRECT);
+        player.getInventory().setItemInMainHand(hand);
+    }
 
 
     public static String encryptLocation(Location loc) {
@@ -95,7 +129,6 @@ public class CoreUtils {
     }
 
 
-
     public static Color generateColor(double seed, double frequency) {
         return generateColor(seed, frequency, 100);
     }
@@ -115,7 +148,6 @@ public class CoreUtils {
     }
 
 
-
     public static void debug(Object obj) {
         debug(obj + "");
     }
@@ -126,17 +158,17 @@ public class CoreUtils {
 
     }
 
-    public static PageResult pagify(List<String> things, int items) {
+    public static PageResult pagify(List<Object> things, int items) {
         return pagify(things, items, 1);
     }
 
-    public static PageResult pagify(List<String> things, int items, int page) {
+    public static PageResult pagify(List<Object> things, int items, int page) {
 
-        List<String> rtn = new ArrayList<>();
+        List<Object> rtn = new ArrayList<>();
         int totalposts = 0;
-        int pagetracker = ((page - 1) * items) - 1;
+        int pagetracker = 0;
 
-        for (String s : things) {
+        for (Object s : things) {
             // REFERENCE for (int i = (page - 1) * pageResult; i < page * pageResult; i++)
             totalposts = totalposts + 1;
             pagetracker = pagetracker + 1;
@@ -174,7 +206,6 @@ public class CoreUtils {
         }
         return string;
     }
-
 
 
     public static List<String> getPageResults(List<String> rules, int page, int pageResult) {

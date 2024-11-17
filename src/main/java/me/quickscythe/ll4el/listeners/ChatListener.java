@@ -1,9 +1,13 @@
 package me.quickscythe.ll4el.listeners;
 
 import me.quickscythe.ll4el.LastLife;
-import me.quickscythe.ll4el.utils.CoreUtils;
-import me.quickscythe.ll4el.utils.misc.BoogieManager;
-import me.quickscythe.ll4el.utils.misc.LifeManager;
+import me.quickscythe.ll4el.utils.chat.ChatManager;
+import me.quickscythe.ll4el.utils.chat.MessageUtils;
+import me.quickscythe.ll4el.utils.chat.placeholder.PlaceholderUtils;
+import me.quickscythe.ll4el.utils.misc.managers.BoogieManager;
+import me.quickscythe.ll4el.utils.misc.managers.LifeManager;
+import me.quickscythe.ll4el.utils.misc.managers.PartyManager;
+import me.quickscythe.ll4el.utils.misc.managers.PlayerManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -15,9 +19,13 @@ public class ChatListener implements Listener {
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent e){
-        if(e.getMessage().startsWith("!test"))
-            LifeManager.addLife(e.getPlayer());
-        if(e.getMessage().startsWith("!run"))
-            BoogieManager.rollBoogies(1,true);
+
+        if(PartyManager.inPartyChat(e.getPlayer())){
+            PartyManager.handleChat(e.getPlayer(), e.getMessage());
+            e.setCancelled(true);
+            return;
+        }
+        e.setFormat(MessageUtils.colorize(PlaceholderUtils.replace(e.getPlayer(), ChatManager.getFormat("player"))) + MessageUtils.colorize(ChatManager.getFormat("chat")).replaceAll("%message%", e.getMessage()));
+
     }
 }

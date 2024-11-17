@@ -46,17 +46,30 @@ public class GuiInventory {
         return id;
     }
 
-    public void addItem(String identifier, GuiItem item) {
-        items.put(identifier, item);
+    public void addItem(GuiItem item) {
+        items.put(item.getIdentifier(), item);
     }
 
     public Inventory getInventory(Player player) {
+        storedItems.put(player, new HashMap<ItemStack, GuiItem>());
+        for (GuiItem item : items.values()) {
+            storedItems.get(player).put(item.getItem(player), item);
+        }
         Inventory inv = Bukkit.createInventory(player, size, PlaceholderUtils.replace(player, display_name));
         for (int i = 0; i != config.length(); i++) {
             String key = config.substring(i, i + 1);
-            inv.setItem(i, getGuiItem(key).getItem(player));
+            GuiItem item = getGuiItem(key);
+            ItemStack stack = item.getItem(player);
+            if (i < inv.getSize()) {
+                inv.setItem(i, stack);
+                storedItems.get(player).put(inv.getItem(i), item);
+            }
         }
         return inv;
+    }
+
+    public void reload(Player player) {
+        GuiManager.openGui(player, this);
     }
 
     public GuiItem getGuiItem(String key) {
@@ -69,11 +82,19 @@ public class GuiInventory {
 
     public GuiItem getItem(ItemStack item, Player player) {
         if (storedItems.containsKey(player)) {
-            for (Entry<ItemStack, GuiItem> entry : storedItems.get(player).entrySet())
-                if (entry.getKey().equals(item)) return entry.getValue();
+            for (Entry<ItemStack, GuiItem> entry : storedItems.get(player).entrySet()) {
+                if (entry.getKey() == null) continue;
+                if (entry.getKey().equals(item)) {
+                    return entry.getValue();
+                }
+            }
 
         }
         return null;
+    }
+
+    private boolean itemMatches(ItemStack key, ItemStack item) {
+        return (key.hasItemMeta() && item.hasItemMeta() && key.getItemMeta().getLore().equals(item.getItemMeta().getLore()) && key.getItemMeta().getDisplayName().equalsIgnoreCase(item.getItemMeta().getDisplayName())) && key.getType().equals(item.getType());
     }
 
     public String getConfig() {
@@ -86,10 +107,7 @@ public class GuiInventory {
 
     protected void open(Player player) {
         player.openInventory(getInventory(player));
-        storedItems.put(player, new HashMap<ItemStack, GuiItem>());
-        for (GuiItem item : items.values()) {
-            storedItems.get(player).put(item.getItem(player), item);
-        }
+
     }
 
     protected void close(Player player) {

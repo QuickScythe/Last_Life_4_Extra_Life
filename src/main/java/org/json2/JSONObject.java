@@ -525,11 +525,9 @@ public class JSONObject {
     /**
      * Get the value object associated with a key.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return The object associated with the key.
-     * @throws JSONException
-     *             if the key is not found.
+     * @throws JSONException if the key is not found.
      */
     public Object get(String key) throws JSONException {
         if (key == null) {
